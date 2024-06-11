@@ -99,6 +99,7 @@ int main()
 
 	// Generate VAO and VBO with only 1 object each
 	// 1 VAO can hold several VBOs, allowing us to switch between VBOs
+	// Element Buffer Objects (EBOs) keep indices, allows reusing data
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
