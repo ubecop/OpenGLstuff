@@ -88,15 +88,15 @@ int main()
 	// Get ID of uniform called "scale"
 	GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
 
-	/*
-	float prev_time = float(glfwGetTime()); // Keeps track of time
-	float angle = 0.0f; // Will control the color
-	*/
+	
+	//float prev_time = float(glfwGetTime()); // Keeps track of time
+	//float angle = 0.0f; // Will control the color
+	//
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
-
+		
 		// Specify the color of the background
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		// Clean the back buffer and assign the new color to it
@@ -110,26 +110,26 @@ int main()
 		glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
-		//glfwSwapBuffers(window); If you want an epileptic seizure
+		//glfwSwapBuffers(window); //If you want an epileptic seizure
 		
 
 		// To use this trigonometry section, remove the comment markers from prev_time and angle
 		// And put the section of the loop above in comments 
 
-		/*
-		float time = float(glfwGetTime());
-		if (time - prev_time >= 0.1f) // this is True every 0.1 seconds
-		{
-			angle += 0.1f; // Changes angle to change colors
-			prev_time = time; // Resets prev_time to current time
-		}
+		
+		//float time = float(glfwGetTime());
+		//if (time - prev_time >= 0.1f) // this is True every 0.1 seconds
+		//{
+		//	angle += 0.1f; // Changes angle to change colors
+		//	prev_time = time; // Resets prev_time to current time
+		//}
 
-		// Use of trigonometry to nicely change colors
-		glClearColor(float(sin(angle)), float(cos(angle)), float(tan(angle)), 1.0f);
-		// Basic needed functions for changes to be visible
-		glClear(GL_COLOR_BUFFER_BIT);
-		glfwSwapBuffers(window);
-		*/
+		//// Use of trigonometry to nicely change colors
+		//glClearColor(float(sin(angle)), float(cos(angle)), float(tan(angle)), 1.0f);
+		//// Basic needed functions for changes to be visible
+		//glClear(GL_COLOR_BUFFER_BIT);
+		//glfwSwapBuffers(window);
+		
 
 		// Take care of all GLFW events
 		glfwPollEvents();
