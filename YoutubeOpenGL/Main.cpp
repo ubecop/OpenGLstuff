@@ -16,9 +16,9 @@
 GLfloat vertices[] =
 { //     COORDINATES    /   COLORS         // TEXTURES    
 	-0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   0.0f, 0.0f,// Lower left corner
-	-0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   0.0f, 1.0f,// Upper left corner
-	 0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,   1.0f, 1.0f,// Upper right corner
-	 0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 1.0f,   1.0f, 0.0f // Lower left corner
+	-0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   0.0f, 5.0f,// Upper left corner
+	0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,   5.0f, 5.0f,// Upper right corner
+	0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 1.0f,   5.0f, 0.0f // Lower left corner
 };
 
 // Indices for vertices order
@@ -90,7 +90,7 @@ int main()
 	GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
 
 	// Texture
-	
+
 	Texture popCat("pop_cat.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 	popCat.texUnit(shaderProgram, "tex0", 0);
 
