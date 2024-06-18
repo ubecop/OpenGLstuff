@@ -6,23 +6,39 @@ layout (location = 1) in vec3 aColor;
 // Texture coordinates
 layout (location = 2) in vec2 aTex;
 
+// Normal coordinates (not necessarily normalized)
+layout (location = 3) in vec3 aNormal;
+
 // Outputs the color for Fragment Shader
 out vec3 color;
 // Outputs the texture coordinates for Fragment Shader
 out vec2 texCoord;
+// Outputs the normal for the Fragment Shader
+out vec3 Normal;
+// Outputs the current position for the Fragment Shader
+out vec3 crntPos;
 
-// Controls the scale of the vertices
-uniform float scale;
 
-// Camera uniform
+// Imports camera matrix from main function
 uniform mat4 camMatrix;
+
+// Imports model matrix from main function
+uniform mat4 model;
 
 void main()
 {
+	// calculates current position
+	crntPos = vec3(model * vec4(aPos, 1.0f));
+	
 	// Outputs the positions/coordinates of all vertices
-	gl_Position = camMatrix * vec4(aPos,1.0);
+	gl_Position = camMatrix * vec4(crntPos, 1.0);
+
 	// Assigns the colors from the Vertex Data to "color"
 	color = aColor;
+
 	// Assigns the texture coordinates from the Vertex Data to "texCoord" 
 	texCoord = aTex;
+
+	// Assigns normal from the Vertex Data to "Normal"
+	Normal = aNormal;
 };
