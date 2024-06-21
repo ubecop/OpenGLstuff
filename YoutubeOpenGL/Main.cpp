@@ -160,7 +160,7 @@ int main()
 	lightEBO.Unbind();
 
 	// Change light color here (RGBA)
-	glm::vec4 lightColor = glm::vec4(1.0f, 0.65f, 0.0f, 1.0f);
+	glm::vec4 lightColor = glm::vec4(0.0f, 0.65f, 1.0f, 1.0f);
 	
 	// Change light source position here
 	glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -188,6 +188,7 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
+	
 	/*
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -237,7 +238,7 @@ int main()
 	*/
 	// Comment the while loop above to use window program below and vice-versa.
 	
-
+	
 	// Makes the light source cube orbit around pyramid
 	// As long as the window is open
 	while (!glfwWindowShouldClose(window))
