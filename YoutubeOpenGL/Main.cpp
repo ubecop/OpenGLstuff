@@ -6,6 +6,12 @@
 #include<glm\gtc\matrix_transform.hpp>
 #include<glm\gtc\type_ptr.hpp>
 
+#include <vector>
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <cmath>
+
 #include"Texture.h"
 #include"shaderClass.h"
 #include"VAO.h"
@@ -13,58 +19,84 @@
 #include"EBO.h"
 #include"Camera.h"
 
-const unsigned int width = 800;
-const unsigned int height = 800;
+const unsigned int width = 2000;
+const unsigned int height = 1100;
 
-// Vertices coordinates
+const int N = 100;
+const double PI = 3.14159265358979323846;
+
+// Function to read vertices from a file
+std::vector<GLfloat> readVerticesFromFile(const std::string& filename) {
+	std::vector<GLfloat> vertices;
+	std::ifstream file(filename);
+	if (!file.is_open()) {
+		std::cerr << "Failed to open file: " << filename << std::endl;
+		return vertices;
+	}
+
+	std::string line;
+	while (std::getline(file, line)) {
+		std::istringstream iss(line);
+		GLfloat value;
+		while (iss >> value) {
+			vertices.push_back(value);
+		}
+	}
+
+	return vertices;
+}
+
+// Function to read indices from a file
+std::vector<GLuint> readIndicesFromFile(const std::string& filename) {
+	std::vector<GLuint> indices;
+	std::ifstream file(filename);
+	if (!file.is_open()) {
+		std::cerr << "Failed to open file: " << filename << std::endl;
+		return indices;
+	}
+
+	GLuint index;
+	while (file >> index) {
+		indices.push_back(index);
+	}
+
+	return indices;
+}
+
+
+
+// Vertices coordinates to test
+/*
 GLfloat vertices[] =
-{ //     COORDINATES     /        COLORS          /   TexCoord      /     NORMALS          //
-	-0.5f, 0.0f,  0.5f,      0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,       0.0f, -1.0f, 0.0f,  // Bottom side
-	-0.5f, 0.0f, -0.5f,      0.83f, 0.70f, 0.44f,	 0.0f, 5.0f,       0.0f, -1.0f, 0.0f,  // Bottom side
-	 0.5f, 0.0f, -0.5f,      0.83f, 0.70f, 0.44f,  	 5.0f, 5.0f,       0.0f, -1.0f, 0.0f,  // Bottom side 
-	 0.5f, 0.0f,  0.5f,      0.83f, 0.70f, 0.44f, 	 5.0f, 0.0f,       0.0f, -1.0f, 0.0f,  // Bottom side
-
-	-0.5f, 0.0f,  0.5f,      0.83f, 0.70f, 0.44f,    0.0f, 0.0f,      -0.8f,  0.5f, 0.0f,  // Left side
-	-0.5f, 0.0f, -0.5f,      0.83f, 0.70f, 0.44f,    5.0f, 0.0f,      -0.8f,  0.5f, 0.0f,  // Left side
-	 0.0f, 0.8f,  0.0f,      0.92f, 0.86f, 0.76f,    2.5f, 5.0f,      -0.8f,  0.5f, 0.0f,  // Left side
-
-	-0.5f, 0.0f, -0.5f,      0.83f, 0.70f, 0.44f,    5.0f, 0.0f,       0.0f,  0.5f,-0.8f,  // Non-facing side
-	 0.5f, 0.0f, -0.5f,      0.83f, 0.70f, 0.44f,    0.0f, 0.0f,       0.0f,  0.5f,-0.8f,  // Non-facing side
-	 0.0f, 0.8f,  0.0f,      0.92f, 0.86f, 0.76f,    2.5f, 5.0f,       0.0f,  0.5f,-0.8f,  // Non-facing side
-
-	 0.5f, 0.0f, -0.5f,      0.83f, 0.70f, 0.44f,    0.0f, 0.0f,       0.8f,  0.5f, 0.0f,  // Right side
-	 0.5f, 0.0f,  0.5f,      0.83f, 0.70f, 0.44f,    5.0f, 0.0f,       0.8f,  0.5f, 0.0f,  // Right side
-	 0.0f, 0.8f,  0.0f,      0.92f, 0.86f, 0.76f,    2.5f, 5.0f,       0.8f,  0.5f, 0.0f,  // Right side
-
-	 0.5f, 0.0f,  0.5f,      0.83f, 0.70f, 0.44f,    5.0f, 0.0f,       0.0f,  0.5f, 0.8f,  // Facing side
-	-0.5f, 0.0f,  0.5f,      0.83f, 0.70f, 0.44f,    0.0f, 0.0f,       0.0f,  0.5f, 0.8f,  // Facing side
-	 0.0f, 0.8f,  0.0f,      0.92f, 0.86f, 0.76f,    2.5f, 5.0f,       0.0f,  0.5f, 0.8f   // Facing side
+{ //     COORDINATES              /        COLORS          /   TexCoord      /     NORMALS          //
+	1.42E-01, -6.00E-01, 2.63E+00,  0.83f, 0.70f, 0.44f,    0.0f, 0.0f,       0.0f, 1.0f, 0.0f,
+   -1.42E-01, -6.00E-01, 2.63E+00,  0.83f, 0.70f, 0.44f,    0.0f, 1.0f,       0.0f, 1.0f, 0.0f,
+   -9.84E-02, -6.00E-01, 2.58E+00,  0.83f, 0.70f, 0.44f,    1.0f, 1.0f,       0.0f, 1.0f, 0.0f,
+	9.84E-02, -6.00E-01, 2.58E+00,  0.83f, 0.70f, 0.44f,    1.0f, 0.0f,       0.0f, 1.0f, 0.0f
 };
 
 
 // Indices for vertices order. Indices allow vertices to be reused.
 GLuint indices[] =
 {
-	0, 1, 2,  // Bottom side
-    0, 2, 3,  // Bottom side
-	4, 6, 5,  // Left side
-	7, 9, 8,  // Non-facing side
-	10, 12, 11, // Right side
-	13, 15, 14  // Facing side
+	0, 1, 2,
+	0, 3, 2
 };
+*/
+
 
 
 // Vertices for the light source cube
 GLfloat lightVertices[] =
 { // COORDINATES    //
-	-0.1f, -0.1f,  0.1f,
-	-0.1f, -0.1f, -0.1f,
-	 0.1f, -0.1f, -0.1f,
-	 0.1f, -0.1f,  0.1f,
-	-0.1f,  0.1f,  0.1f,
-	-0.1f,  0.1f, -0.1f,
-	 0.1f,  0.1f, -0.1f,
-	 0.1f,  0.1f,  0.1f
+	-0.05f, -0.05f,  0.05f,
+	-0.05f, -0.05f, -0.05f,
+	0.05f, -0.05f, -0.05f,
+	0.05f, -0.05f,  0.05f,
+   -0.05f,  0.05f,  0.05f,
+   -0.05f,  0.05f, -0.05f,
+	0.05f,  0.05f, -0.05f,
+	0.05f,  0.05f,  0.05f
 };
 
 // Light source indices
@@ -116,24 +148,39 @@ int main()
 	glViewport(0, 0, width, height);
 
 
+	// Define the vertices and indices file paths
+	std::string verticesFile = "adjusted_vertices.txt";
+	std::string indicesFile = "triangle_indices.txt";
+
+	// Read vertices and indices from files
+	std::vector<GLfloat> satelliteVertices = readVerticesFromFile(verticesFile);
+	std::vector<GLuint> satelliteIndices = readIndicesFromFile(indicesFile);
+
 
 	// Generates Shader object using shaders defualt.vert and default.frag
 	Shader shaderProgram("default.vert", "default.frag");
 
-   // Generates Vertex Array Object and binds it
+	// Generates Vertex Array Object and binds it
 	VAO VAO1;
 	VAO1.Bind();
 
 	// Generates Vertex Buffer Object and links it to vertices
-	VBO VBO1(vertices, sizeof(vertices));
+	VBO VBO1(satelliteVertices.data(), satelliteVertices.size() * sizeof(GLfloat));
 	// Generates Element Buffer Object and links it to indices
-	EBO EBO1(indices, sizeof(indices));
+	EBO EBO1(satelliteIndices.data(), satelliteIndices.size() * sizeof(GLuint));
 
 	// Links VBO to VAO
 	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 11 * sizeof(float), (void*)0);
 	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 11 * sizeof(float), (void*)(3 * sizeof(float)));
 	VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, 11 * sizeof(float), (void*)(6 * sizeof(float)));
 	VAO1.LinkAttrib(VBO1, 3, 3, GL_FLOAT, 11 * sizeof(float), (void*)(8 * sizeof(float)));
+
+	// if using positions, colors, textures and normals
+	/*VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 11 * sizeof(float), (void*)(3 * sizeof(float)));
+	VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, 11 * sizeof(float), (void*)(6 * sizeof(float)));
+	VAO1.LinkAttrib(VBO1, 3, 3, GL_FLOAT, 11 * sizeof(float), (void*)(8 * sizeof(float)));*/
+
+
 	// Unbind all to prevent accidentally modifying them
 	VAO1.Unbind();
 	VBO1.Unbind();
@@ -160,35 +207,35 @@ int main()
 	lightEBO.Unbind();
 
 	// Change light color here (RGBA)
-	glm::vec4 lightColor = glm::vec4(0.0f, 0.65f, 1.0f, 1.0f);
-	
+	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+
 	// Change light source position here
-	glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
+	glm::vec3 lightPos = glm::vec3(2.0f, 0.0f, 0.0f);
 	glm::mat4 lightModel = glm::mat4(1.0f);
 	lightModel = glm::translate(lightModel, lightPos);
 
-	glm::vec3 pyramidPos = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::mat4 pyramidModel = glm::mat4(1.0f);
-	pyramidModel = glm::translate(pyramidModel, pyramidPos);
+	glm::vec3 satellitePos = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::mat4 satelliteModel = glm::mat4(1.0f);
+	satelliteModel = glm::translate(satelliteModel, satellitePos);
 
 	lightShader.Activate();
 	glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
 	glUniform4f(glGetUniformLocation(lightShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	shaderProgram.Activate();
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(pyramidModel));
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(satelliteModel));
 	glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightColor.x, lightColor.y, lightColor.z);
 
 	// Texture
 
-	Texture brickTex("brick.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-	brickTex.texUnit(shaderProgram, "tex0", 0);
+	Texture metalTex("chrome_metal.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	metalTex.texUnit(shaderProgram, "tex0", 0);
 
 	// Enables Depth Buffer
 	glEnable(GL_DEPTH_TEST);
 
-	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
-	
+	Camera camera(width, height, glm::vec3(1.0f, 1.0f, 3.0f));
+
 	/*
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -198,7 +245,7 @@ int main()
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		// Clean the back buffer and assign the new color to it
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
+
 
 		// Handles camera inputs
 		camera.Inputs(window);
@@ -213,11 +260,11 @@ int main()
 		camera.Matrix(shaderProgram, "camMatrix");
 
 		// Binds texture so that it appears in rendering
-		brickTex.Bind();
+		metalTex.Bind();
 		// Bind the VAO so OpenGL knows to use it
 		VAO1.Bind();
 		// Draw primitives, number of indices, datatype of indices, index of indices
-		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, satelliteIndices.size(), GL_UNSIGNED_INT, 0);
 
 		// Tells OpenGL which Shader Program to use
 		lightShader.Activate();
@@ -237,7 +284,7 @@ int main()
 	}
 	*/
 	// Comment the while loop above to use window program below and vice-versa.
-	
+
 	
 	// Makes the light source cube orbit around pyramid
 	// As long as the window is open
@@ -252,9 +299,9 @@ int main()
 		// Update the light position if needed
 		// For demonstration, let's move the light in a circle around the pyramid
 		float time = glfwGetTime();
-        // Change rotation axis here, replace with x, y  or z
-		lightPos.x = 1.0f * sin(time);
-		lightPos.z = 1.0f * cos(time);
+		// Change rotation axis here, replace with x, y  or z
+		lightPos.y = 7.0f * sin(time);
+		lightPos.z = 7.0f * cos(time);
 		lightModel = glm::mat4(1.0f);
 		lightModel = glm::translate(lightModel, lightPos);
 
@@ -274,9 +321,9 @@ int main()
 		camera.Matrix(shaderProgram, "camMatrix");
 
 		// Bind and draw the pyramid
-		brickTex.Bind();
+		metalTex.Bind();
 		VAO1.Bind();
-		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, satelliteIndices.size(), GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -287,7 +334,7 @@ int main()
 	VAO1.Delete();
 	VBO1.Delete();
 	EBO1.Delete();
-	brickTex.Delete();
+	metalTex.Delete();
 	shaderProgram.Delete();
 	lightVAO.Delete();
 	lightVBO.Delete();
